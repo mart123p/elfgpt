@@ -1,0 +1,5 @@
+*.gguf
+env/
+__pycache__
+celerybeat-schedule.db
+.flaskenv

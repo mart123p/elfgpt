@@ -1,0 +1,17 @@
+name: "ElfGPT 3"
+author: "mart123p"
+category: web
+description: "I have gained new abilities. I can now read/list files on a server. What could go wrong? Username: montrehack, password: montrehack2023"
+value: 200
+type: standard
+connection_info: https://elfgpt.martinpouliot.ca/
+
+flags:
+    - FLAG-7r4D1710N4L_53CUR17y_15_571LL_4_7h1N6
+
+tags:
+    - web
+    - llm
+
+state: visible
+version: "0.1"

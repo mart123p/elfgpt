@@ -1,0 +1,17 @@
+name: "ElfGPT 2"
+author: "mart123p"
+category: web
+description: "This time there are some protections in place. Can you still manage to leak my secret? Username: montrehack, password: montrehack2023"
+value: 100
+type: standard
+connection_info: https://elfgpt.martinpouliot.ca/
+
+flags:
+    - FLAG-CLASSIFIERS_BARELY_HELP
+
+tags:
+    - web
+    - llm
+
+state: visible
+version: "0.1"

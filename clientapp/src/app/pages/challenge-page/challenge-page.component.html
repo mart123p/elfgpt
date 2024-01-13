@@ -1,0 +1,49 @@
+<div class="clr-row clr-justify-content-center">
+    <div class="clr-col-8">
+      <div class="card">
+        <h3 class="card-header">Challenge {{id}}</h3>
+        <div class="card-block">
+          <h4 class="card-title">{{type}}</h4>
+          <div class="card-text">
+            <div style="text-align: center;">
+                <img src="assets/{{logo}}" width="150px"/>
+                <p>{{description}}</p>
+            </div>
+
+            <form clrForm clrLayout="vertical">
+                <clr-textarea-container>
+                    <label>Message</label>
+                    <textarea clrTextarea placeholder="Your message for ElfGPT" class="full-width" [formControl]="userMessage"></textarea>
+                  </clr-textarea-container>
+                    <button type="button" (click)="requestCapacity()" class="btn btn-icon btn-primary" [disabled]="locked">
+                        <cds-icon shape="chat-bubble"></cds-icon> Send message
+                    </button>
+                    <button type="button" (click)="cancel()" class="btn btn-icon btn-danger" [disabled]="isCanceling" *ngIf="state !== stateEnum.DONE">
+                      <cds-icon shape="times"></cds-icon> Cancel
+                    </button>
+            </form>
+            <hr/>
+            <div style="text-align: center;">
+                <span *ngIf="state !== stateEnum.DONE" class="spinner spinner-inline"></span>
+                <ng-container *ngIf="!isCanceling; else cancelMessage">
+                  <span *ngIf="state === stateEnum.CAPACITY_REQUEST">Requesting capacity...</span>
+                  <span *ngIf="state === stateEnum.CAPACITY_WAIT">{{queuePos}} request(s) before you...</span>
+                  <span *ngIf="state === stateEnum.GENERATING">Writing...</span>
+                </ng-container>
+                <ng-template #cancelMessage>
+                  <span>Canceling...</span>
+                </ng-template>
+
+                <p class="elfgpt-message">{{llmMessage}}</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+<div class="clr-row clr-justify-content-center">
+
+</div>

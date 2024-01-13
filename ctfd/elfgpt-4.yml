@@ -1,0 +1,20 @@
+name: "ElfGPT 3 part 2"
+author: "mart123p"
+category: web
+description: "Apparently this server can access other resources. Can you access other resources? Username: montrehack, password: montrehack2023"
+value: 300
+type: standard
+connection_info: https://elfgpt.martinpouliot.ca/
+
+flags:
+    - FLAG-B4d_php_15_3v3RywH3R3
+
+requirements:
+    - "ElfGPT 3"
+
+tags:
+    - web
+    - llm
+
+state: visible
+version: "0.1"

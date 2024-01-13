@@ -1,0 +1,163 @@
+version: "3"
+services:
+  redis-data:
+    image: redis:alpine3.19
+    restart: unless-stopped
+    expose:
+      - 6379
+    networks:
+      - elfgpt-network
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+
+  flask:
+    image: elfgpt-flask
+    restart: unless-stopped
+    expose:
+      - 5000
+    build:
+      context: ../
+      dockerfile: infra/flask/Dockerfile
+
+    environment:
+      - REDIS_URL=redis://redis-data:6379/0
+      - SECRET_KEY=${FLASK_SECRET_KEY}
+
+    networks:
+      - elfgpt-network
+    depends_on:
+      - redis-data
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+
+  celery-beat:
+    image: elfgpt-beat
+    restart: unless-stopped
+    build:
+      context: ../
+      dockerfile: infra/celery-beat/Dockerfile
+    environment:
+      - REDIS_URL=redis://redis-data:6379/0
+    networks:
+      - elfgpt-network
+    depends_on:
+      - redis-data
+      - celery-worker_common
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+
+  celery-worker_gpu:
+    image: elfgpt-worker-gpu
+    restart: unless-stopped
+    build:
+      context: ../
+      dockerfile: infra/celery-worker_gpu/Dockerfile
+    environment:
+      - REDIS_URL=redis://redis-data:6379/0
+      - NGINX_BRIDGE_PORT=8000
+      - NGINX_BRIDGE_HOSTNAME=nginx-bridge
+      - NGINX_BRIDGE_USERNAME=proxy
+      - NGINX_BRIDGE_PASSWORD=${BRIDGE_PASSWORD}
+    networks:
+      - elfgpt-network
+    depends_on:
+      - redis-data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+
+  celery-worker_common:
+    image: elfgpt-worker-common
+    restart: unless-stopped
+    build:
+      context: ../
+      dockerfile: infra/celery-worker_common/Dockerfile
+    environment:
+      - REDIS_URL=redis://redis-data:6379/0
+      - DOCKER_SOCKET=unix://var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - elfgpt-network
+    depends_on:
+      - redis-data
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+  
+  nginx-bridge:
+    container_name: nginx-bridge
+    image: nginx-bridge
+    restart: unless-stopped
+    build:
+      context: nginx-bridge
+      dockerfile: ./Dockerfile
+    expose:
+      - 8000
+    environment:
+      - NGINX_PROXY_PASSWORD=${BRIDGE_PASSWORD}
+    networks:
+      - elfgpt-network
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+
+  nginx-frontdoor:
+    image: nginx-frontdoor
+    restart: unless-stopped
+    build:
+      context: nginx-frontdoor
+      dockerfile: ./Dockerfile
+    expose:
+      - 8000
+    environment:
+      - NGINX_FRONTDOOR_PASSWORD=${FRONTDOOR_PASSWORD}
+    networks:
+      - elfgpt-network
+      - frontdoor-network
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    
+  tunnel:
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    networks:
+      - frontdoor-network
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+
+networks:
+  elfgpt-network:
+    driver: bridge
+  frontdoor-network:
+    driver: bridge

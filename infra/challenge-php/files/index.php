@@ -1,0 +1,52 @@
+<?php 
+
+if(!isset($_GET['action'])){
+    echo 'use between, action=list, read=file';
+    exit(0);
+}
+
+$directory = __DIR__;
+
+$logHandle = fopen($directory.'/access.log', 'a');
+if ($logHandle === false) {
+    echo 'ERROR: Unable to open file for appending.';
+    exit(0);
+}
+
+$currentTime = date("Y-m-d H:i:s");
+
+if($_GET['action'] === 'list'){
+    fwrite($logHandle, '['.$currentTime.'] - Action: list'.PHP_EOL);
+    if (is_dir($directory)) {
+        if ($dh = opendir($directory)) {
+            while (($file = readdir($dh)) !== false) {
+                if ($file != '.' && $file != '..') {
+                    echo $file . PHP_EOL;
+                }
+            }
+            closedir($dh);
+        } else {
+            echo 'ERROR: Could not open the directory.';
+        }
+    } else {
+        echo 'ERROR: Directory does not exist.';
+    }
+}else if($_GET['action'] === 'file'){
+    if(isset($_GET['file'])){
+        fwrite($logHandle, '['.$currentTime.'] - Action: file File: '.$_GET['file'].PHP_EOL);
+        if(file_exists($_GET['file']) && $_GET['file'] !== "index.php"){
+            // TODO: implement caching with redis instead of reading a file on disk. It's faster! 
+            // To configure the client use the hostname in the environment variables.
+
+            include $_GET['file'];
+        }else{
+            echo 'ERROR: file is not found.';
+        }
+    }else{
+        echo 'ERROR: file argument is not set.';
+    }
+}else{
+    echo 'ERROR: Unknown argument.';
+}
+fclose($logHandle);
+?>

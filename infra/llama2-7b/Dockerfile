@@ -1,0 +1,3 @@
+FROM scratch
+WORKDIR /
+COPY llama-2-7b-chat.Q5_K_M.gguf /

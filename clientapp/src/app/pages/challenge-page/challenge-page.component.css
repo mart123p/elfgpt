@@ -1,0 +1,10 @@
+form button{
+    margin-top: 0.4em;
+    margin-right: 1em;
+}
+
+.elfgpt-message{
+    white-space: pre;
+    text-align: left;
+    text-wrap: pretty;
+}

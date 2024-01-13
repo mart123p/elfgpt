@@ -1,0 +1,17 @@
+name: "ElfGPT 1"
+author: "mart123p"
+category: web
+description: "Apparently AI is the new hot thing. Can you convince me to reveal my secret?. Username: montrehack, password: montrehack2023"
+value: 100
+type: standard
+connection_info: https://elfgpt.martinpouliot.ca/
+
+flags:
+    - FLAG-LLM_CAN_BE_DUMB
+
+tags:
+    - web
+    - llm
+
+state: visible
+version: "0.1"

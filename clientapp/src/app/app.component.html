@@ -1,0 +1,60 @@
+<div class="main-container">
+  <div class="alert alert-app-level alert-danger" role="alert" *ngIf="state !== stateEnum.OK && state !== stateEnum.CONNECTING">
+    <div class="alert-items">
+      <div class="alert-item static">
+        <div class="alert-icon-wrapper">
+          <cds-icon class="alert-icon" shape="exclamation-circle"></cds-icon>
+        </div>
+        <div class="alert-text" *ngIf="state === stateEnum.DISCONNECTED">The connection to the server was lost.</div>
+        <div class="alert-text" *ngIf="state === stateEnum.TIMEOUT">The server could not be reached in the time allocated.</div>
+        <div class="alert-actions">
+          <button class="btn alert-action" (click)="refreshPage()">Retry</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="alert alert-app-level alert-warning" role="alert" *ngIf="hasServerError">
+    <div class="alert-items">
+      <div class="alert-item static">
+        <div class="alert-icon-wrapper">
+          <cds-icon class="alert-icon" shape="exclamation-triangle"></cds-icon>
+        </div>
+        <div class="alert-text">The server encountered an error: {{serverErrorMsg}}</div>
+        <div class="alert-actions">
+          <button class="btn alert-action" (click)="serverErrorDismiss()">Dismiss</button>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="serverErrorDismiss()">
+      <cds-icon aria-hidden="true" shape="close"></cds-icon>
+    </button>
+  </div>
+  <header class="header header-1">
+    <div class="branding">
+      <a routerLink="/" class="nav-link" [class.lock-disabled]="locked">
+        <cds-icon shape="snowflake"></cds-icon>
+        <span class="title">ElfGPT</span>
+      </a>
+    </div>
+  </header>
+  <div class="content-container">
+    <div class="loading-container" *ngIf="loading; else connected">
+      <div class="loading">
+        <span class="spinner spinner-lg">Loading...</span>
+        <p>Loading ElfGPT...</p>
+      </div>
+    </div>
+    <ng-template #connected>
+      <div class="content-area">
+        <router-outlet></router-outlet>
+      </div>
+      <clr-vertical-nav>
+  
+        <a *ngFor="let challenge of CHALLENGES" clrVerticalNavLink  [routerLink]="'./challenge/' + challenge.id" routerLinkActive="active" [class.lock-disabled]="locked">Challenge {{challenge.id}}</a>
+  
+        <div class="nav-divider"></div>
+        <a clrVerticalNavLink routerLink="./disclaimer" routerLinkActive="active" [class.lock-disabled]="locked">Disclaimer</a>
+      </clr-vertical-nav>
+    </ng-template>
+  </div>
+</div>
